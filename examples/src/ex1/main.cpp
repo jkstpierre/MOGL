@@ -1,17 +1,18 @@
 /**
- * @file window.cpp
+ * @file main.cpp
  * @author jkstpierre (jkstpierre@wpi.edu)
  * @brief 
  * @version 0.1
- * @date 2020-07-25
+ * @date 2020-07-26
  * 
  * @copyright Copyright (c) 2020
  * 
  */
 
-#include <mogl/windows/window.hpp>
+#include <mogl/mogl.hpp>
 
-namespace mogl::windows
+int main()
 {
 
+  return 0;
 }

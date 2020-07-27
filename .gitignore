@@ -28,6 +28,8 @@ _deps
 /doxygen_docs
 /doxygen.tag
 /build*
+/latex
+/html
 
 .idea
 

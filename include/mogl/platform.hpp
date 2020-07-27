@@ -23,7 +23,8 @@
 #elif defined(__linux__)
 #define MOGL_OS_LINUX
 #include <X11/Xlib.h>
-#include <GL/glx.h>
+#include <mogl/ext/glad/glad_glx.h>
+#include <sys/time.h>
 #elif defined(__APPLE__)
 #define MOGL_OS_APPLE
 #endif
