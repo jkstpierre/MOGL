@@ -10,7 +10,6 @@
  */
 
 #include <mogl/mogl.hpp>
-#include <stdexcept>
 
 namespace mogl
 {
@@ -19,34 +18,30 @@ namespace mogl
 
 #elif defined(MOGL_OS_LINUX)
   ModernOpenGL::ModernOpenGL(uint8_t colorBits, uint8_t depthBits, uint8_t stencilBits,
-                             uint16_t samples, const Display &rDisplay, const Window &rWindow) : mrDisplay(rDisplay)
+                             uint16_t samples, const Display *pDisplay, const Window &rWindow) : mpDisplay(pDisplay)
   {
-    // Create OpenGL context for the X window
-
+    // Check if there is already an active instance of MOGL
     if (spInstance)
     {
-      // There is already an active instance of OpenGL
-      throw std::runtime_error("There can only be one active instance of ModernOpenGL.");
-    }
-
-    // Load GL extensions from GLAD
-    if (!gladLoadGL())
-    {
-      throw std::runtime_error("Failed to load extensions for OpenGL 4.6.");
+      throw std::runtime_error("There can only be one active ModernOpenGL instance");
     }
 
     // Get the display and screen in terms glx can use
-    Display *pDisplay = const_cast<Display *>(&rDisplay);
-    int screen = DefaultScreen(pDisplay);
+    Display *display = const_cast<Display *>(mpDisplay);
+    if (!display)
+    {
+      throw std::runtime_error("Pointer to X server cannot be null.");
+    }
+    int screen = DefaultScreen(display);
 
     // Load GLX extensions from GLAD
-    if (!gladLoadGLX(pDisplay, screen))
+    if (!gladLoaderLoadGLX(display, screen))
     {
       throw std::runtime_error("Failed to load extensions for GLX.");
     }
 
     // Attributes for configuration
-    const int frameBufferAttribs[] = {
+    static const int frameBufferAttribs[] = {
         GLX_X_RENDERABLE, GL_TRUE,
         GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
         GLX_DOUBLEBUFFER, GL_TRUE,
@@ -61,7 +56,7 @@ namespace mogl
 
     // Configure the frame buffer for the given display
     int count;
-    GLXFBConfig *configs = glXChooseFBConfig(pDisplay, screen, frameBufferAttribs, &count);
+    GLXFBConfig *configs = glXChooseFBConfig(display, screen, frameBufferAttribs, &count);
     if (count == 0)
     {
       throw std::runtime_error("Failed to find any valid frame buffers for the provided settings.");
@@ -79,16 +74,31 @@ namespace mogl
         0};
 
     // Create the OpenGL 4.6 context
-    mContext = glXCreateContextAttribsARB(pDisplay, config, nullptr, GL_TRUE, contextAttribs);
+    mContext = glXCreateContextAttribsARB(display, config, nullptr, GL_TRUE, contextAttribs);
     if (!mContext)
     {
       throw std::runtime_error("Failed to create an OpenGL context.");
     }
 
     // Make the context current for the window
-    glXMakeCurrent(pDisplay, rWindow, mContext);
+    glXMakeCurrent(display, rWindow, mContext);
 
-    // TODO: Get default viewport
+    // Load GL extensions from GLAD
+    if (!gladLoaderLoadGL())
+    {
+      throw std::runtime_error("Failed to load extensions for OpenGL 4.6.");
+    }
+
+    // Get the major and minor version of the new OpenGL context
+    int major, minor;
+    glGetIntegerv(GL_MAJOR_VERSION, &major);
+    glGetIntegerv(GL_MINOR_VERSION, &minor);
+
+    if (major != MOGL_MAJOR_VERSION || minor != MOGL_MINOR_VERSION)
+    {
+      // TODO: Use std::format for this when available
+      throw std::runtime_error("Created OpenGL context version mismatch!");
+    }
 
     // Track this instance of MOGL
     spInstance = this;
@@ -98,13 +108,36 @@ namespace mogl
   {
     // Free all MOGL resources here
 
+    freeAllObjects();
+
     // Destroy the OpenGL context
-    Display *pDisplay = const_cast<Display *>(&mrDisplay);
+    Display *pDisplay = const_cast<Display *>(mpDisplay);
     glXMakeCurrent(pDisplay, 0, NULL);
     glXDestroyContext(pDisplay, mContext);
 
     // Indicate no more active instance
     spInstance = nullptr;
   }
+
+  void ModernOpenGL::setVerticalSync(bool enabled) noexcept
+  {
+    glXSwapIntervalSGI(enabled ? 1 : 0);
+  }
 #endif
+
+  void ModernOpenGL::freeAllObjects() noexcept
+  {
+    // Delete every object from the mogl object map
+    for (auto it = mObjectMap.begin(); it != mObjectMap.end(); it++)
+    {
+      for (auto obj = it->second.begin(); obj != it->second.end(); obj++)
+      {
+        printf("Delete 2\n");
+        delete obj->second;
+        obj->second = nullptr;
+      }
+    }
+
+    mObjectMap.clear();
+  }
 } // namespace mogl

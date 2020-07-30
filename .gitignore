@@ -35,6 +35,7 @@ _deps
 
 # Workspace 
 *.code-workspace
+.vscode
 
 # Output Folder
 build/

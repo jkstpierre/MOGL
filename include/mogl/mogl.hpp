@@ -13,6 +13,12 @@
 #define __MOGL_MOGL_HPP__
 
 #include <mogl/platform.hpp>
+#include <mogl/base/object.hpp>
+#include <typeindex>
+#include <typeinfo>
+#include <unordered_map>
+#include <vector>
+#include <stdexcept>
 
 namespace mogl
 {
@@ -55,10 +61,10 @@ namespace mogl
      * @param depthBits The number of bits for the depth buffer
      * @param stencilBits The number of bits for the stencil buffer
      * @param samples The number of samples for antialiasing
-     * @param rDisplay The X11 display server reference
+     * @param pDisplay The X11 display server pointer
      * @param rWindow The X11 window reference
      */
-    ModernOpenGL(uint8_t colorBits, uint8_t depthBits, uint8_t stencilBits, uint16_t samples, const Display &rDisplay, const Window &rWindow);
+    ModernOpenGL(uint8_t colorBits, uint8_t depthBits, uint8_t stencilBits, uint16_t samples, const Display *pDisplay, const Window &rWindow);
 #endif
     /**
      * @brief Destroy the Modern OpenGL object
@@ -66,13 +72,131 @@ namespace mogl
      */
     virtual ~ModernOpenGL() noexcept;
 
-    ModernOpenGL(const ModernOpenGL&) = delete;
+    /**
+     * @brief Delete all copy and move constructors and operators
+     * 
+     */
+    ModernOpenGL(const ModernOpenGL &) = delete;
+    ModernOpenGL(ModernOpenGL &&) noexcept = delete;
+    ModernOpenGL &operator=(const ModernOpenGL &) = delete;
+    ModernOpenGL &operator=(ModernOpenGL &&) noexcept = delete;
 
-    ModernOpenGL(ModernOpenGL&&) noexcept = delete;
+    /**
+     * @brief Enable/disable vsync.
+     * 
+     * @param enabled true to enable vsync, false to disable
+     */
+    void setVerticalSync(bool enabled) noexcept;
 
-    ModernOpenGL& operator=(const ModernOpenGL&) = delete;
+    /**
+     * @brief Allocate and return a new mogl object
+     * 
+     * @tparam T The type of mogl object to create
+     * @tparam Args 
+     * @param args The list of arguments to send to the constructor
+     * @return T* 
+     */
+    template <class T, class... Args>
+    T *alloc(Args &&... args)
+    {
+      static_assert(std::is_base_of<base::Object, T>::value); // Ensure T is a mogl object
 
-    ModernOpenGL& operator=(ModernOpenGL&&) noexcept = delete;
+      T *pNewObj = new T(std::forward<Args>(args)...);
+
+      std::type_index tIndex = typeid(T);
+      if (mObjectMap.find(tIndex) == mObjectMap.end())
+      {
+        // Create a new entry
+        mObjectMap.emplace(std::piecewise_construct, std::make_tuple(tIndex), std::make_tuple());
+      }
+
+      // Add the object to the map of mogl objects
+      auto pBaseObj = static_cast<base::Object *>(pNewObj);
+
+      if (mObjectMap.at(tIndex).find(pBaseObj->getID()) == mObjectMap.at(tIndex).end())
+      {
+        mObjectMap.at(tIndex)[pBaseObj->getID()] = pNewObj;
+      }
+      else
+      {
+        // Should never happen
+        throw std::runtime_error("Failed to allocate ModernOpenGL object.");
+      }
+
+      // Return our new object to the caller
+      return pNewObj;
+    };
+
+    /**
+     * @brief Get a mogl object by its type and id number. Returns nullptr if failed to find a mogl object.
+     * 
+     * @tparam T 
+     * @param rID 
+     * @return T* 
+     */
+    template <class T>
+    T *get(const GLuint &rID)
+    {
+      static_assert(std::is_base_of<base::Object, T>::value);
+
+      std::type_index tIndex = typeid(T);
+      if (mObjectMap.find(tIndex) != mObjectMap.end())
+      {
+        auto &objects = mObjectMap.at(tIndex);
+        if (objects.find(rID) != objects.end())
+        {
+          return dynamic_cast<T *>(objects.at(rID));
+        }
+      }
+
+      return nullptr;
+    }
+
+    /**
+     * @brief Free a mogl obj and set the obj pointer to nullptr. If rpObj is not nullptr after return, rpObj was not freed.
+     * 
+     * @tparam T The type of mogl object to free
+     * @param rpObj Referenced pointer to the object to delete
+     */
+    template <class T>
+    void free(T *&rpObj)
+    {
+      static_assert(std::is_base_of<base::Object, T>::value);
+
+      // Cast templated object to base class
+      auto pObj = static_cast<base::Object *>(rpObj);
+
+      std::type_index tIndex = typeid(T);
+      if (mObjectMap.find(tIndex) != mObjectMap.end())
+      {
+        auto &&objects = mObjectMap.at(tIndex);
+        if (objects.find(pObj->getID()) != objects.end())
+        {
+          // Remove the object from map
+          size_t r = objects.erase(pObj->getID());
+
+          // Delete the object
+          delete rpObj;
+          // Indicate deletion to caller
+          rpObj = nullptr;
+        }
+        else
+        {
+          throw std::runtime_error("Failed to free ModernOpenGL object.");
+        }
+      }
+      else
+      {
+        throw std::runtime_error("Failed to free ModernOpenGL object.");
+      }
+    }
+
+  private:
+    /**
+     * @brief Free all the allocated objects handled by mogl
+     * 
+     */
+    void freeAllObjects() noexcept;
 
   private:
     /**
@@ -84,11 +208,14 @@ namespace mogl
 
   private:
 #if defined(MOGL_OS_WINDOWS)
-    HGLRC mContext;
+    HGLRC mContext; // The active OpenGL context
 #elif defined(MOGL_OS_LINUX)
-    GLXContext mContext;
-    const Display &mrDisplay;
+    GLXContext mContext;      // The active OpenGL context
+    const Display *mpDisplay; // The connection to the XServer for this context
 #endif
+
+    // The currently active mogl objects
+    std::unordered_map<std::type_index, std::unordered_map<int, base::Object *>> mObjectMap;
   };
 } // namespace mogl
 
