@@ -16,10 +16,12 @@
 
 namespace mogl::objects
 {
+  const GLuint GLBUFFER_ID_NONE = 0U;   // Null Buffer Id
+
   /**
    * @brief A GLbuffer is an OpenGL object that stores data such as vertices and elements among other things for use during draw calls.
-   * For a GLbuffer to be used during a draw call, a GLvertexArray's GLbindingPoint must be set to read from the buffer and 1 or more 
-   * GLattributes from the same GLvertexArray object must be configured to read from the GLbindingPoint associated to the GLbuffer.
+   * For a GLbuffer to be used during a draw call, a GLvertexArray's BindingPoint must be set to read from the buffer and 1 or more 
+   * GLattributes from the same GLvertexArray object must be configured to read from the BindingPoint associated to the GLbuffer.
    * 
    * @tparam T The type of data to store within the GLbuffer object
    */

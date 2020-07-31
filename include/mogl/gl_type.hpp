@@ -20,7 +20,7 @@ namespace mogl
    * @brief An OOP enumeration for the internal OpenGL types
    * 
    */
-  enum class GLtype : GLuint
+  enum class GLtype : GLenum
   {
     _BYTE = GL_BYTE,
     _UNSIGNED_BYTE = GL_UNSIGNED_BYTE,

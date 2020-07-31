@@ -11,6 +11,7 @@
 
 #include <mogl/mogl.hpp>
 #include <mogl/objects/gl_vertex_array.hpp>
+#include <mogl/objects/gl_buffer.hpp>
 
 int main()
 {
@@ -27,6 +28,8 @@ int main()
 
   printf("GLvertexArray id = %u\n", vao->getID());
 
+  auto vbo = gl.alloc<mogl::objects::GLbuffer<float>>();
+  
   gl.free(vao);
 
   return 0;

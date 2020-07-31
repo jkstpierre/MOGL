@@ -22,6 +22,9 @@ namespace mogl
 
 namespace mogl::objects
 {
+  const GLuint GLVERTEXARRAY_ID_NONE = 0U;                      // GLvertexArray Null Id
+  const GLuint GLVERTEXARRAY_DEFAULT_GLBINDINGPOINT_INDEX = 0U; // Default binding point index for attributes
+
   /**
    * @brief A GLvertexArray stores the state of OpenGL BufferObjects in addition to their formats
    * 
@@ -30,21 +33,14 @@ namespace mogl::objects
   {
   public:
     /**
-     * @brief A GLbindingPoint is a location for BufferObjects to attach to
+     * @brief A BindingPoint is a location for BufferObjects to attach to
      * 
      */
-    class GLbindingPoint
+    class BindingPoint
     {
     public:
       /**
-       * @brief Set the Divisor object
-       * 
-       * @param divisor 
-       */
-      void setDivisor(const GLuint &divisor) noexcept;
-
-      /**
-       * @brief Attach a GLbuffer to this GLbindingPoint
+       * @brief Attach a GLbuffer to this BindingPoint
        * 
        * @tparam T The type of data being stored in the buffer
        * @param pBuffer Pointer to the buffer to attach, if nullptr, this binding point will read from no buffer
@@ -52,7 +48,7 @@ namespace mogl::objects
       template <class T>
       void attachBuffer(const GLbuffer<T> *pBuffer) noexcept
       {
-        glVertexArrayVertexBuffer(mrVao.getID(), mIndex, pBuffer ? pBuffer->getID() : GL_NONE,
+        glVertexArrayVertexBuffer(mVaoID, mIndex, pBuffer ? pBuffer->getID() : GLBUFFER_ID_NONE,
                                   GL_NONE, pBuffer ? sizeof(T) : GL_NONE);
       }
 
@@ -62,7 +58,47 @@ namespace mogl::objects
        */
       void attachBuffer(nullptr_t) noexcept;
 
+      /**
+       * @brief Set the Divisor object
+       * 
+       * @param divisor 
+       */
+      void setDivisor(GLuint divisor) noexcept;
 
+      /**
+       * @brief Get the Vao I D object
+       * 
+       * @return const GLuint& 
+       */
+      const GLuint &getVaoID() const noexcept;
+
+      /**
+       * @brief Get the Index object
+       * 
+       * @return const GLuint& 
+       */
+      const GLuint &getIndex() const noexcept;
+
+      /**
+       * @brief Get the Buffer I D object
+       * 
+       * @return GLuint 
+       */
+      GLuint getBufferID() const noexcept;
+
+      /**
+       * @brief Get the Stride object
+       * 
+       * @return GLuint 
+       */
+      GLuint getStride() const noexcept;
+
+      /**
+       * @brief Get the Divisor object
+       * 
+       * @return GLuint 
+       */
+      GLuint getDivisor() const noexcept;
 
     private:
       friend class GLvertexArray; // Grant GLvertexArray exclusive instantiation rights
@@ -73,34 +109,35 @@ namespace mogl::objects
        * @param rVao 
        * @param index 
        */
-      GLbindingPoint(const GLvertexArray &rVao, GLuint index) noexcept;
+      BindingPoint(const GLvertexArray &rVao, GLuint index) noexcept;
 
       /**
        * @brief Destroy the Binding Point object
        * 
        */
-      ~GLbindingPoint() noexcept;
+      ~BindingPoint() noexcept;
 
     private:
-      const GLvertexArray &mrVao; // The reference to the host vao
-      const GLuint mIndex;        // The index of the binding point
+      const GLuint mVaoID; // The id of the vao for this binding point
+      const GLuint mIndex; // The index of the binding point
     };
 
     /**
-     * @brief An GLattribute specifies the formatting of buffer data inside a GLbindingPoint
+     * @brief An Attribute specifies the formatting of buffer data inside a BindingPoint
      * 
      */
-    class GLattribute
+    class Attribute
     {
     public:
       /**
-       * @brief Format this GLattribute
+       * @brief Format this Attribute
        * 
        * @param size The number of elements in the attribute (between 1-4)
        * @param type The type of data each element in the attribute is
+       * @param normalized Should OpenGL normalize the data (Note: Ignored if type is not _FLOAT)
        * @param relativeOffset The difference between successive elements in the buffer
        */
-      void format(GLuint size, GLtype type, GLuint relativeOffset) noexcept;
+      void format(GLuint size, GLtype type, GLboolean normalized, GLuint relativeOffset) noexcept;
 
       /**
        * @brief Enable this attribute during draw calls
@@ -115,19 +152,19 @@ namespace mogl::objects
       void disable() noexcept;
 
       /**
-       * @brief Set the Binding Point object. If the GLbindingPoint comes from a different vao than this attribute, 
+       * @brief Set the Binding Point object. If the BindingPoint comes from a different vao than this attribute, 
        * an exception will be thrown
        * 
-       * @param rBindingPoint 
+       * @param rBindingPoint Const reference to the binding point
        */
-      void setBindingPoint(const GLbindingPoint &rBindingPoint);
+      void setBindingPoint(const BindingPoint &rBindingPoint);
 
       /**
        * @brief Get the Vao object
        * 
        * @return const GLuint& 
        */
-      const GLuint &getVao() const noexcept;
+      const GLuint &getVaoID() const noexcept;
 
       /**
        * @brief Get the Index object
@@ -137,11 +174,11 @@ namespace mogl::objects
       const GLuint &getIndex() const noexcept;
 
       /**
-       * @brief Get the Binding Point object
+       * @brief Get the Binding Point Index object
        * 
-       * @return const GLbindingPoint& 
+       * @return const GLuint& 
        */
-      const GLbindingPoint &getBindingPoint() const noexcept;
+      const GLuint &getBindingPointIndex() const noexcept;
 
       /**
        * @brief Get the Size object
@@ -175,23 +212,24 @@ namespace mogl::objects
       friend class GLvertexArray; // Grant GLvertexArray exclusive instantiation rights
 
       /**
-       * @brief Construct a new GLattribute object
+       * @brief Construct a new Attribute object
        * 
        * @param rVao Reference to the host vao
        * @param index The index for the attribute
        */
-      GLattribute(const GLvertexArray &rVao, GLuint index) noexcept;
+      Attribute(const GLvertexArray &rVao, GLuint index) noexcept;
 
       /**
-       * @brief Destroy the GLattribute object
+       * @brief Destroy the Attribute object
        * 
        */
-      ~GLattribute() noexcept;
+      ~Attribute() noexcept;
 
     private:
-      const GLvertexArray &mrVao;           // The reference to the host vao
-      const GLuint mIndex;                  // The index of the attribute
-      const GLbindingPoint *mpBindingPoint; // The binding point this attribute is reading from
+      const GLuint mVaoID; // The id of the parent vao
+      const GLuint mIndex; // The index of the attribute
+      GLuint mBindingPointIndex =
+          GLVERTEXARRAY_DEFAULT_GLBINDINGPOINT_INDEX; // The index of the associated binding point
     };
 
   private:
