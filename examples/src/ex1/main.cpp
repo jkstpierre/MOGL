@@ -10,7 +10,7 @@
  */
 
 #include <mogl/mogl.hpp>
-#include <mogl/objects/vao.hpp>
+#include <mogl/objects/gl_vertex_array.hpp>
 
 int main()
 {
@@ -23,9 +23,9 @@ int main()
 
   gl.setVerticalSync(true);
 
-  auto vao = gl.alloc<mogl::objects::VertexArrayObject>();
+  auto vao = gl.alloc<mogl::objects::GLvertexArray>();
 
-  printf("VertexArrayObject id = %u\n", vao->getID());
+  printf("GLvertexArray id = %u\n", vao->getID());
 
   gl.free(vao);
 

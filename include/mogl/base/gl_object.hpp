@@ -1,5 +1,5 @@
 /**
- * @file object.hpp
+ * @file globject.hpp
  * @author jkstpierre (jkstpierre@wpi.edu)
  * @brief 
  * @version 0.1
@@ -9,8 +9,8 @@
  * 
  */
 
-#ifndef __MOGL_BASE_OBJECT_HPP__
-#define __MOGL_BASE_OBJECT_HPP__
+#ifndef __MOGL_BASE_GLOBJECT_HPP__
+#define __MOGL_BASE_GLOBJECT_HPP__
 
 #include <mogl/platform.hpp>
 
@@ -25,13 +25,13 @@ namespace mogl
 
 namespace mogl::base
 {
-  const GLuint OBJECT_ID_NONE = 0U;
+  const GLuint GLOBJECT_ID_NONE = 0U;
 
   /**
-   * @brief An Object is an abstract base class for all objects created and managed by OpenGL that have an id.
+   * @brief An GLobject is an abstract base class for all objects created and managed by OpenGL that have an id.
    * 
    */
-  class Object
+  class GLobject
   {
   public:
     /**
@@ -42,17 +42,17 @@ namespace mogl::base
     const GLuint &getID() const noexcept;
 
   protected:
-    Object() = default;
-    virtual ~Object() = default;
+    GLobject() = default;
+    virtual ~GLobject() = default;
 
     /**
      * @brief Delete copy and move constructors for all Objects
      * 
      */
-    Object(const Object &) = delete;
-    Object(Object &&) noexcept = delete;
-    Object &operator=(const Object &) = delete;
-    Object &operator=(Object &&) noexcept = delete;
+    GLobject(const GLobject &) = delete;
+    GLobject(GLobject &&) noexcept = delete;
+    GLobject &operator=(const GLobject &) = delete;
+    GLobject &operator=(GLobject &&) noexcept = delete;
 
   protected:
     friend class mogl::ModernOpenGL; // Grant ModernOpenGL access to private fields
@@ -61,7 +61,7 @@ namespace mogl::base
      * @brief The id number of this object
      * 
      */
-    GLuint mID = OBJECT_ID_NONE;
+    GLuint mID = GLOBJECT_ID_NONE;
   };
 } // namespace mogl::base
 

@@ -132,7 +132,6 @@ namespace mogl
     {
       for (auto obj = it->second.begin(); obj != it->second.end(); obj++)
       {
-        printf("Delete 2\n");
         delete obj->second;
         obj->second = nullptr;
       }

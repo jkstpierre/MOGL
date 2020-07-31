@@ -13,7 +13,7 @@
 #define __MOGL_MOGL_HPP__
 
 #include <mogl/platform.hpp>
-#include <mogl/base/object.hpp>
+#include <mogl/base/gl_object.hpp>
 #include <typeindex>
 #include <typeinfo>
 #include <unordered_map>
@@ -99,7 +99,7 @@ namespace mogl
     template <class T, class... Args>
     T *alloc(Args &&... args)
     {
-      static_assert(std::is_base_of<base::Object, T>::value); // Ensure T is a mogl object
+      static_assert(std::is_base_of<base::GLobject, T>::value); // Ensure T is a mogl object
 
       T *pNewObj = new T(std::forward<Args>(args)...);
 
@@ -111,7 +111,7 @@ namespace mogl
       }
 
       // Add the object to the map of mogl objects
-      auto pBaseObj = static_cast<base::Object *>(pNewObj);
+      auto pBaseObj = static_cast<base::GLobject *>(pNewObj);
 
       if (mObjectMap.at(tIndex).find(pBaseObj->getID()) == mObjectMap.at(tIndex).end())
       {
@@ -137,7 +137,7 @@ namespace mogl
     template <class T>
     T *get(const GLuint &rID)
     {
-      static_assert(std::is_base_of<base::Object, T>::value);
+      static_assert(std::is_base_of<base::GLobject, T>::value);
 
       std::type_index tIndex = typeid(T);
       if (mObjectMap.find(tIndex) != mObjectMap.end())
@@ -161,10 +161,10 @@ namespace mogl
     template <class T>
     void free(T *&rpObj)
     {
-      static_assert(std::is_base_of<base::Object, T>::value);
+      static_assert(std::is_base_of<base::GLobject, T>::value);
 
       // Cast templated object to base class
-      auto pObj = static_cast<base::Object *>(rpObj);
+      auto pObj = static_cast<base::GLobject *>(rpObj);
 
       std::type_index tIndex = typeid(T);
       if (mObjectMap.find(tIndex) != mObjectMap.end())
@@ -215,7 +215,7 @@ namespace mogl
 #endif
 
     // The currently active mogl objects
-    std::unordered_map<std::type_index, std::unordered_map<int, base::Object *>> mObjectMap;
+    std::unordered_map<std::type_index, std::unordered_map<int, base::GLobject *>> mObjectMap;
   };
 } // namespace mogl
 
