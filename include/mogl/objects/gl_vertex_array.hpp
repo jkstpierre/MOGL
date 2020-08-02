@@ -14,6 +14,7 @@
 
 #include <mogl/objects/gl_buffer.hpp>
 #include <mogl/gl_type.hpp>
+#include <vector>
 
 namespace mogl
 {
@@ -22,8 +23,8 @@ namespace mogl
 
 namespace mogl::objects
 {
-  const GLuint GLVERTEXARRAY_ID_NONE = 0U;                      // GLvertexArray Null Id
-  const GLuint GLVERTEXARRAY_DEFAULT_GLBINDINGPOINT_INDEX = 0U; // Default binding point index for attributes
+  const GLuint GLVERTEXARRAY_ID_NONE = 0U;                          // GLvertexArray Null Id
+  const unsigned int GLVERTEXARRAY_BINDINGPOINT_DEFAULT_INDEX = 0U; // Default binding point index for attributes
 
   /**
    * @brief A GLvertexArray stores the state of OpenGL BufferObjects in addition to their formats
@@ -75,9 +76,9 @@ namespace mogl::objects
       /**
        * @brief Get the Index object
        * 
-       * @return const GLuint& 
+       * @return const unsigned int& 
        */
-      const GLuint &getIndex() const noexcept;
+      const unsigned int &getIndex() const noexcept;
 
       /**
        * @brief Get the Buffer I D object
@@ -109,7 +110,7 @@ namespace mogl::objects
        * @param rVao 
        * @param index 
        */
-      BindingPoint(const GLvertexArray &rVao, GLuint index) noexcept;
+      BindingPoint(const GLvertexArray &rVao, unsigned int index) noexcept;
 
       /**
        * @brief Destroy the Binding Point object
@@ -118,8 +119,8 @@ namespace mogl::objects
       ~BindingPoint() noexcept;
 
     private:
-      const GLuint mVaoID; // The id of the vao for this binding point
-      const GLuint mIndex; // The index of the binding point
+      const GLuint mVaoID;       // The id of the vao for this binding point
+      const unsigned int mIndex; // The index of the binding point
     };
 
     /**
@@ -171,14 +172,14 @@ namespace mogl::objects
        * 
        * @return const GLuint& 
        */
-      const GLuint &getIndex() const noexcept;
+      const unsigned int &getIndex() const noexcept;
 
       /**
        * @brief Get the Binding Point Index object
        * 
        * @return const GLuint& 
        */
-      const GLuint &getBindingPointIndex() const noexcept;
+      const unsigned int &getBindingPointIndex() const noexcept;
 
       /**
        * @brief Get the Size object
@@ -217,20 +218,49 @@ namespace mogl::objects
        * @param rVao Reference to the host vao
        * @param index The index for the attribute
        */
-      Attribute(const GLvertexArray &rVao, GLuint index) noexcept;
+      Attribute(GLvertexArray &rVao, unsigned int index) noexcept;
 
       /**
        * @brief Destroy the Attribute object
        * 
        */
-      ~Attribute() noexcept;
+      ~Attribute() noexcept = default;
 
     private:
-      const GLuint mVaoID; // The id of the parent vao
-      const GLuint mIndex; // The index of the attribute
-      GLuint mBindingPointIndex =
-          GLVERTEXARRAY_DEFAULT_GLBINDINGPOINT_INDEX; // The index of the associated binding point
+      const GLuint mVaoID;       // The id of the parent vao
+      const unsigned int mIndex; // The index of the attribute
+      unsigned int mBindingPointIndex =
+          GLVERTEXARRAY_BINDINGPOINT_DEFAULT_INDEX; // The index of the associated binding point
     };
+
+  public:
+    /**
+     * @brief Get the Binding Point object
+     * 
+     * @return BindingPoint& 
+     */
+    BindingPoint &getBindingPoint(unsigned int index);
+
+    /**
+     * @brief Get the Binding Points Size object
+     * 
+     * @return size_t 
+     */
+    size_t getBindingPointsSize() const noexcept;
+
+    /**
+     * @brief Get the Attribute object
+     * 
+     * @return Attribute& 
+     */
+    Attribute &getAttribute(unsigned int index);
+
+    /**
+     * @brief Get the Attributes Size object
+     * 
+     * @return size_t 
+     */
+    size_t getAttributesSize() const noexcept;
 
   private:
     friend class mogl::ModernOpenGL; // Grant MOGL allocation rights
@@ -240,6 +270,11 @@ namespace mogl::objects
      * 
      */
     GLvertexArray();
+
+    /**
+     * @brief Destroy the GLvertexArray object
+     * 
+     */
     ~GLvertexArray();
 
     /**
@@ -249,6 +284,8 @@ namespace mogl::objects
     void bind() noexcept;
 
   private:
+    std::vector<BindingPoint *> mBindingPoints; // The buffer BindingPoints for the GLvertexArray
+    std::vector<Attribute *> mAttributes;       // The attributes for the GLvertexArray
   };
 } // namespace mogl::objects
 

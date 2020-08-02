@@ -10,6 +10,7 @@
  */
 
 #include <mogl/objects/gl_vertex_array.hpp>
+#include <stdexcept>
 
 namespace mogl::objects
 {
@@ -30,7 +31,7 @@ namespace mogl::objects
     return mVaoID;
   }
 
-  const GLuint &GLvertexArray::BindingPoint::getIndex() const noexcept
+  const unsigned int &GLvertexArray::BindingPoint::getIndex() const noexcept
   {
     return mIndex;
   }
@@ -62,7 +63,7 @@ namespace mogl::objects
     return static_cast<GLuint>(sDivisor);
   }
 
-  GLvertexArray::BindingPoint::BindingPoint(const GLvertexArray &rVao, GLuint index) noexcept
+  GLvertexArray::BindingPoint::BindingPoint(const GLvertexArray &rVao, unsigned int index) noexcept
       : mVaoID(rVao.getID()), mIndex(index)
   {
     setDivisor(0);
@@ -96,7 +97,115 @@ namespace mogl::objects
     }
   }
 
+  void GLvertexArray::Attribute::enable() noexcept
+  {
+    glEnableVertexArrayAttrib(mVaoID, mIndex);
+  }
+
+  void GLvertexArray::Attribute::disable() noexcept
+  {
+    glDisableVertexArrayAttrib(mVaoID, mIndex);
+  }
+
+  void GLvertexArray::Attribute::setBindingPoint(const GLvertexArray::BindingPoint &rBindingPoint)
+  {
+    if (rBindingPoint.getVaoID() != mVaoID)
+    {
+      throw std::runtime_error("Cannot associate attributes and binding points for separate vertex arrays.");
+    }
+
+    mBindingPointIndex = rBindingPoint.getIndex();
+    glVertexArrayAttribBinding(mVaoID, mIndex, mBindingPointIndex);
+  }
+
+  const GLuint &GLvertexArray::Attribute::getVaoID() const noexcept
+  {
+    return mVaoID;
+  }
+
+  const unsigned int &GLvertexArray::Attribute::getIndex() const noexcept
+  {
+    return mIndex;
+  }
+
+  const unsigned int &GLvertexArray::Attribute::getBindingPointIndex() const noexcept
+  {
+    return mBindingPointIndex;
+  }
+
+  GLuint GLvertexArray::Attribute::getSize() const noexcept
+  {
+    static GLint sSize;
+
+    glGetVertexArrayIndexediv(mVaoID, mIndex, GL_VERTEX_ATTRIB_ARRAY_SIZE, &sSize);
+
+    return static_cast<GLuint>(sSize);
+  }
+
+  GLtype GLvertexArray::Attribute::getType() const noexcept
+  {
+    static GLint sType;
+
+    glGetVertexArrayIndexediv(mVaoID, mIndex, GL_VERTEX_ATTRIB_ARRAY_TYPE, &sType);
+
+    return static_cast<GLtype>(sType);
+  }
+
+  GLuint GLvertexArray::Attribute::getRelativeOffset() const noexcept
+  {
+    static GLint sRelativeOffset;
+
+    glGetVertexArrayIndexediv(mVaoID, mIndex, GL_VERTEX_ATTRIB_RELATIVE_OFFSET, &sRelativeOffset);
+
+    return static_cast<GLuint>(sRelativeOffset);
+  }
+
+  GLboolean GLvertexArray::Attribute::isEnabled() const noexcept
+  {
+    static GLint sEnabled;
+
+    glGetVertexArrayIndexediv(mVaoID, mIndex, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &sEnabled);
+
+    return static_cast<GLboolean>(sEnabled);
+  }
+
+  GLvertexArray::Attribute::Attribute(GLvertexArray &rVao, unsigned int index) noexcept
+      : mVaoID(rVao.getID()), mIndex(index), mBindingPointIndex(GLVERTEXARRAY_BINDINGPOINT_DEFAULT_INDEX)
+  {
+    setBindingPoint(rVao.getBindingPoint(mBindingPointIndex));
+  }
+
   // GLvertexArray
+
+  GLvertexArray::BindingPoint &GLvertexArray::getBindingPoint(unsigned int index)
+  {
+    if (index >= mBindingPoints.size())
+    {
+      throw std::runtime_error("Binding point index out of bounds.");
+    }
+
+    return *mBindingPoints.at(index);
+  }
+
+  size_t GLvertexArray::getBindingPointsSize() const noexcept
+  {
+    return mBindingPoints.size();
+  }
+
+  GLvertexArray::Attribute &GLvertexArray::getAttribute(unsigned int index)
+  {
+    if (index >= mAttributes.size())
+    {
+      throw std::runtime_error("Attribute index out of bounds.");
+    }
+
+    return *mAttributes.at(index);
+  }
+
+  size_t GLvertexArray::getAttributesSize() const noexcept
+  {
+    return mAttributes.size();
+  }
 
   GLvertexArray::GLvertexArray()
   {
