@@ -1,13 +1,14 @@
 /**
- * @file  objects/object.hpp.
+ * @file  mogl/object.hpp.
  *
  * Declares the object class
  */
 
-#ifndef __MOGL_OBJECTS_OBJECT_HPP__
-#define __MOGL_OBJECTS_OBJECT_HPP__
+#ifndef __MOGL_GL_OBJECT_HPP__
+#define __MOGL_GL_OBJECT_HPP__
 
-#include "mogl/loaders.hpp"
+#include "mogl/platform.hpp"
+#include "mogl/heap_protected.hpp"
 
 namespace mogl
 {
@@ -17,9 +18,9 @@ namespace mogl
  * @author  jkstpierre
  * @date  8/29/2020
  */
-class Object
+template <class T>
+class GLobject : public HeapProtected<T>
 {
-  friend class Allocator; // Grant allocator allocation rights
 public:
   /**
    * Gets the identifier
@@ -29,7 +30,10 @@ public:
    *
    * @returns The identifier.
    */
-  const GLuint& getID() const noexcept;
+  const GLuint& getID() const noexcept
+  {
+    return mID;
+  }
 
 protected:
   /**
@@ -40,7 +44,7 @@ protected:
    *
    * @param [in,out]  parameter1  The first parameter.
    */
-  Object() = default;
+  GLobject() = default;
 
   /**
    * Destructor
@@ -48,9 +52,9 @@ protected:
    * @author  jkstpierre
    * @date  8/29/2020
    */
-  virtual ~Object() noexcept = default;
+  virtual ~GLobject() noexcept = default;
 
-private:
+protected:
   /** The id number of this Object. GL_NONE if there's no id */
   GLuint mID = GL_NONE;
 };

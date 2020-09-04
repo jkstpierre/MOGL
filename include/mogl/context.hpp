@@ -4,23 +4,25 @@
  * Declares the context class
  */
 
-#ifndef __MOGL_CONTEXT_HPP__
-#define __MOGL_CONTEXT_HPP__
+#ifndef __MOGL_GL_CONTEXT_HPP__
+#define __MOGL_GL_CONTEXT_HPP__
 
-#include "mogl/loaders.hpp"
-#include "mogl/allocator.hpp"
+#include "mogl/platform.hpp"
+#include "mogl/draw_mode.hpp"
+#include "mogl/vertex_array/vertex_array.hpp"
+#include "mogl/shader_program/binary.hpp"
 #include <cstdint>
+#include <memory>
+#include <functional>
+#include <array>
 
 namespace mogl
 {
 /** The context major version */
-const unsigned CONTEXT_MAJOR_VERSION = 4U;
+const unsigned GL_CONTEXT_MAJOR_VERSION = 4U;
 
 /** The context minor version */
-const unsigned CONTEXT_MINOR_VERSION = 6U;
-
-/** Forward declaration of the Allocator */
-class Allocator;
+const unsigned GL_CONTEXT_MINOR_VERSION = 6U;
 
 /**
  * An OS independent OOP compliant OpenGL 4.6 context.
@@ -28,7 +30,7 @@ class Allocator;
  * @author  jkstpierre
  * @date  8/28/2020
  */
-class Context final
+class GLcontext final
 {
 public:
 #if defined(MOGL_OS_WINDOWS)
@@ -44,7 +46,7 @@ public:
    * @param   antialias The antialias samples.
    * @param   dc        The Windows device-context.
    */
-  Context(uint8_t color, uint8_t depth, uint8_t stencil, uint8_t antialias, HDC dc);
+  GLcontext(GLubyte color, GLubyte depth, GLubyte stencil, GLubyte antialias, HDC dc);
 
 #elif defined(MOGL_OS_LINUX)
   /**
@@ -59,7 +61,7 @@ public:
    * @param   antialias The antialias samples.
    * @param   window    The X11 window.
    */
-  Context(uint8_t color, uint8_t depth, uint8_t stencil, uint8_t antialias, Window window);
+  GLcontext(GLubyte color, GLubyte depth, GLubyte stencil, GLubyte antialias, Window window);
 
 #endif
   /**
@@ -68,26 +70,97 @@ public:
    * @author  jkstpierre
    * @date  8/28/2020
    */
-  ~Context() noexcept;
+  ~GLcontext() noexcept;
 
   // Delete copy constructor and copy assignment
-  Context(const Context&) = delete;
-  Context& operator=(const Context&) = delete;
+  GLcontext(const GLcontext&) = delete;
+  GLcontext& operator=(const GLcontext&) = delete;
 
   // TODO: Implement move constructor and assignment, but for now, lets just delete them
-  Context(Context&&) noexcept = delete;
-  Context& operator=(Context&&) noexcept = delete;
+  GLcontext(GLcontext&&) noexcept = delete;
+  GLcontext& operator=(GLcontext&&) noexcept = delete;
 
 public:
   /**
-   * Gets the allocator
+   * Creates a new OpenGL object on the stack and returns it
+   *
+   * @tparam  T     Generic type parameter.
+   * @tparam  Args  Type of the arguments.
+   * @param   args  Variable arguments providing [in,out] The arguments.
+   *
+   * @returns A T.
+   */
+  template <class T, class... Args>
+  T sAlloc(Args&&... args) const
+  {
+    static_assert(std::is_base_of<GLobject<T>, T>::value);
+
+    return T(std::forward<Args>(args)...);
+  }
+
+  /**
+   * Creates a new OpenGL object on the heap and returns a unique_ptr to the created object
+   *
+   * @tparam  T     Generic type parameter.
+   * @tparam  Args  Type of the arguments.
+   * @param   args  Variable arguments providing [in,out] The arguments.
+   *
+   * @returns A std::unique_ptr&lt;T&gt;
+   */
+  template <class T, class... Args>
+  std::unique_ptr<T, typename T::Deleter> hAlloc(Args&&... args) const
+  {
+    static_assert(std::is_base_of<GLobject<T>, T>::value);
+
+    return std::unique_ptr<T, T::Deleter>(new T(std::forward<Args>(args)...), T::Deleter());
+  }
+
+  /**
+   * Sets a viewport
    *
    * @author  jkstpierre
-   * @date  8/29/2020
+   * @date  9/4/2020
    *
-   * @returns The allocator.
+   * @param   viewport  The viewport.
    */
-  Allocator& getAllocator() noexcept;
+  void setViewport(const std::array<GLint, 4>& viewport) noexcept;
+
+  /**
+   * Gets the viewport
+   *
+   * @author  jkstpierre
+   * @date  9/4/2020
+   *
+   * @returns The viewport.
+   */
+  const std::array<GLint, 4>& getViewport() const noexcept;
+
+  /**
+   * Draw arrays
+   *
+   * @author  jkstpierre
+   * @date  9/4/2020
+   *
+   * @param   vao     The vao.
+   * @param   binary  The executable.
+   * @param   mode    The mode.
+   * @param   first   The first.
+   * @param   count   Number of.
+   */
+  void drawArrays(const GLvertexArray& vao, const GLbinary& binary, GLdrawMode mode, GLint first, GLsizei count) const noexcept;
+
+  /**
+   * Draw elements from vao. NOTE: Vao must have an attached element buffer for this method to work.
+   *
+   * @author  jkstpierre
+   * @date  9/4/2020
+   *
+   * @param   vao     The vao.
+   * @param   binary  The executable.
+   * @param   mode    The mode.
+   * @param   count   Number of.
+   */
+  void drawElements(const GLvertexArray& vao, const GLbinary& binary, GLdrawMode mode, GLsizei count) const noexcept;
 
 private:
   /** True if an OpenGL Context is active (prevents multiple contexts from coexisting) */
@@ -98,14 +171,14 @@ private:
   HDC mDeviceContext;
 
   /** Handle to the active OpenGL context */
-  HGLRC mOpenGLContext;
+  HGLRC mContext;
 
 #elif defined(MOGL_OS_LINUX)
 
 #endif
 
-  /** The Allocator for OpenGL objects*/
-  Allocator mAllocator;
+  /** The viewport */
+  std::array<GLint, 4> mViewport;
 };
 }
 

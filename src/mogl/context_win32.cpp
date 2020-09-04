@@ -5,14 +5,14 @@
  */
 
 #include "mogl/context.hpp"
-#include "mogl/allocator.hpp"
 #include <stdexcept>
+#include <string>
 
 #if defined(MOGL_OS_WINDOWS)
 
 namespace mogl
 {
-Context::Context(uint8_t color, uint8_t depth, uint8_t stencil, uint8_t antialias, HDC dc) : mDeviceContext(nullptr), mOpenGLContext(nullptr)
+GLcontext::GLcontext(GLubyte color, GLubyte depth, GLubyte stencil, GLubyte antialias, HDC dc) : mDeviceContext(nullptr), mContext(nullptr)
 {
   // Make sure only 1 context is ever active
   if ( sActive )
@@ -78,35 +78,44 @@ Context::Context(uint8_t color, uint8_t depth, uint8_t stencil, uint8_t antialia
 
   // The attributes for the context
   const int contextAttribs[] = {
-    WGL_CONTEXT_MAJOR_VERSION_ARB, CONTEXT_MAJOR_VERSION,
-    WGL_CONTEXT_MINOR_VERSION_ARB, CONTEXT_MINOR_VERSION,
+    WGL_CONTEXT_MAJOR_VERSION_ARB, GL_CONTEXT_MAJOR_VERSION,
+    WGL_CONTEXT_MINOR_VERSION_ARB, GL_CONTEXT_MINOR_VERSION,
     WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
     0
   };
 
   // Create the opengl context
-  mOpenGLContext = wglCreateContextAttribsARB(dc, nullptr, contextAttribs);
+  mContext = wglCreateContextAttribsARB(dc, nullptr, contextAttribs);
   // Save device context
   mDeviceContext = dc;
 
   // Destroy temporary context and window 
   wglMakeCurrent(dc, nullptr);
   wglDeleteContext(tempContext);
-  wglMakeCurrent(dc, mOpenGLContext);
+  wglMakeCurrent(dc, mContext);
   DestroyWindow(tempWindow);
+
+  GLint major, minor;
+  glGetIntegerv(GL_MAJOR_VERSION, &major);
+  glGetIntegerv(GL_MINOR_VERSION, &minor);
+
+  if ( major != GL_CONTEXT_MAJOR_VERSION || minor != GL_CONTEXT_MINOR_VERSION )
+  {
+    throw std::runtime_error("Failed to create an OpenGL " + std::to_string(GL_CONTEXT_MAJOR_VERSION) + "." + std::to_string(GL_CONTEXT_MINOR_VERSION) + " context.");
+  }
+
+  // Setup the initial viewport
+  glGetIntegerv(GL_VIEWPORT, mViewport.data());
 
   // Indicate successful context creation
   sActive = true;
 }
 
-Context::~Context() noexcept
+GLcontext::~GLcontext() noexcept
 {
-  // Free all OpenGL objects
-  mAllocator.freeAll();
-
   // Delete the OpenGL context
   wglMakeCurrent(mDeviceContext, nullptr);
-  wglDeleteContext(mOpenGLContext);
+  wglDeleteContext(mContext);
 
   sActive = false;
 }
