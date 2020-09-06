@@ -63,7 +63,7 @@ public:
    *
    * @returns Null if it fails, else the attribute.
    */
-  GLattribute* getAttribute(GLuint index);
+  GLattribute& attribute(GLuint index);
 
   /**
    * Gets binding point
@@ -75,7 +75,7 @@ public:
    *
    * @returns Null if it fails, else the binding point.
    */
-  GLbindingPoint* getBindingPoint(GLuint index);
+  GLbindingPoint& bindingPoint(GLuint index);
 
   /**
    * Number of attributes
@@ -85,7 +85,7 @@ public:
    *
    * @returns The total number of attributes.
    */
-  GLuint numberOfAttributes() const noexcept;
+  GLuint getAttributeCount() const noexcept;
 
   /**
    * Number of binding points
@@ -95,7 +95,7 @@ public:
    *
    * @returns The total number of binding points.
    */
-  GLuint numberOfBindingPoints() const noexcept;
+  GLuint getBindingPointCount() const noexcept;
 
 private:
   /**

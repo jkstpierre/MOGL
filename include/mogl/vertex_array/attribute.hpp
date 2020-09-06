@@ -111,7 +111,7 @@ public:
    *
    * @returns A GLuint.
    */
-  GLuint size() const noexcept;
+  GLuint getSize() const noexcept;
 
   /**
    * Gets the type
@@ -121,7 +121,7 @@ public:
    *
    * @returns A Type.
    */
-  GLtype type() const noexcept;
+  GLtype getType() const noexcept;
 
   /**
    * Relative offset
@@ -131,7 +131,7 @@ public:
    *
    * @returns A GLuint.
    */
-  GLuint relativeOffset() const noexcept;
+  GLuint getRelativeOffset() const noexcept;
 
   /**
    * Is enabled

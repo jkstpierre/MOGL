@@ -73,7 +73,7 @@ const GLuint& GLattribute::getBindingPointIndex() const noexcept
   return mBindingPointIndex;
 }
 
-GLuint GLattribute::size() const noexcept
+GLuint GLattribute::getSize() const noexcept
 {
   static GLint size;
 
@@ -82,7 +82,7 @@ GLuint GLattribute::size() const noexcept
   return static_cast<GLuint>(size);
 }
 
-GLtype GLattribute::type() const noexcept
+GLtype GLattribute::getType() const noexcept
 {
   static GLint type;
 
@@ -91,7 +91,7 @@ GLtype GLattribute::type() const noexcept
   return static_cast<GLtype>(type);
 }
 
-GLuint GLattribute::relativeOffset() const noexcept
+GLuint GLattribute::getRelativeOffset() const noexcept
 {
   static GLint relativeOffset;
 

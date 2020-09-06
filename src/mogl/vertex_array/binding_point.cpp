@@ -37,7 +37,7 @@ void GLbindingPoint::setBuffer(nullptr_t)
   setBuffer<nullptr_t>(nullptr);
 }
 
-GLuint GLbindingPoint::bufferID() const noexcept
+GLuint GLbindingPoint::getBufferID() const noexcept
 {
   static GLint buffer;
 
@@ -46,7 +46,7 @@ GLuint GLbindingPoint::bufferID() const noexcept
   return static_cast<GLuint>(buffer);
 }
 
-GLuint GLbindingPoint::stride() const noexcept
+GLuint GLbindingPoint::getStride() const noexcept
 {
   static GLint stride;
 
@@ -55,7 +55,7 @@ GLuint GLbindingPoint::stride() const noexcept
   return static_cast<GLuint>(stride);
 }
 
-GLuint GLbindingPoint::divisor() const noexcept
+GLuint GLbindingPoint::getDivisor() const noexcept
 {
   static GLint divisor;
 

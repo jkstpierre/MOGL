@@ -11,9 +11,8 @@
 #include "mogl/draw_mode.hpp"
 #include "mogl/vertex_array/vertex_array.hpp"
 #include "mogl/shader_program/binary.hpp"
-#include <cstdint>
+#include "mogl/texture/texture_unit.hpp"
 #include <memory>
-#include <functional>
 #include <array>
 
 namespace mogl
@@ -136,18 +135,51 @@ public:
   const std::array<GLint, 4>& getViewport() const noexcept;
 
   /**
+   * Sets active binary for subsequent draw calls
+   *
+   * @author  jkstpierre
+   * @date  9/5/2020
+   *
+   * @param   binary  The binary.
+   */
+  void setActiveBinary(const GLbinary& binary) noexcept;
+
+  /**
+   * Access the GLtextureUnit at index
+   *
+   * @author  jkstpierre
+   * @date  9/5/2020
+   *
+   * @param   index Zero-based index of the.
+   *
+   * @returns A reference to a GLtextureUnit.
+   */
+  GLtextureUnit& textureUnit(GLuint index);
+
+  /**
+   * Gets texture unit count
+   *
+   * @author  jkstpierre
+   * @date  9/5/2020
+   *
+   * @returns The texture unit count.
+   */
+  GLuint getTextureUnitCount() const noexcept;
+
+  // DRAW COMMANDS 
+
+  /**
    * Draw arrays
    *
    * @author  jkstpierre
    * @date  9/4/2020
    *
-   * @param   vao     The vao.
-   * @param   binary  The executable.
-   * @param   mode    The mode.
-   * @param   first   The first.
-   * @param   count   Number of.
+   * @param   vao   The vao.
+   * @param   mode  The mode.
+   * @param   first The first.
+   * @param   count Number of.
    */
-  void drawArrays(const GLvertexArray& vao, const GLbinary& binary, GLdrawMode mode, GLint first, GLsizei count) const noexcept;
+  void drawArrays(const GLvertexArray& vao, GLdrawMode mode, GLint first, GLsizei count) const noexcept;
 
   /**
    * Draw elements from vao. NOTE: Vao must have an attached element buffer for this method to work.
@@ -155,12 +187,11 @@ public:
    * @author  jkstpierre
    * @date  9/4/2020
    *
-   * @param   vao     The vao.
-   * @param   binary  The executable.
-   * @param   mode    The mode.
-   * @param   count   Number of.
+   * @param   vao   The vao.
+   * @param   mode  The mode.
+   * @param   count Number of.
    */
-  void drawElements(const GLvertexArray& vao, const GLbinary& binary, GLdrawMode mode, GLsizei count) const noexcept;
+  void drawElements(const GLvertexArray& vao, GLdrawMode mode, GLsizei count) const noexcept;
 
 private:
   /** True if an OpenGL Context is active (prevents multiple contexts from coexisting) */
@@ -179,6 +210,9 @@ private:
 
   /** The viewport */
   std::array<GLint, 4> mViewport;
+
+  /** The texture units */
+  std::vector<std::unique_ptr<GLtextureUnit, GLtextureUnit::Deleter>> mTextureUnits;
 };
 }
 

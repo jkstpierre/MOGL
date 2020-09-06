@@ -91,7 +91,7 @@ public:
    *
    * @returns A GLuint.
    */
-  GLuint bufferID() const noexcept;
+  GLuint getBufferID() const noexcept;
 
   /**
    * Gets the stride
@@ -101,7 +101,7 @@ public:
    *
    * @returns A GLuint.
    */
-  GLuint stride() const noexcept;
+  GLuint getStride() const noexcept;
 
   /**
    * Gets the divisor
@@ -111,7 +111,7 @@ public:
    *
    * @returns A GLuint.
    */
-  GLuint divisor() const noexcept;
+  GLuint getDivisor() const noexcept;
 
 private:
   /**

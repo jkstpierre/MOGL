@@ -14,6 +14,7 @@
 #include "mogl/buffer/buffer.hpp"
 #include "mogl/shader_program/program.hpp"
 #include "mogl/shader_program/pipeline.hpp"
+#include "mogl/texture/texture_1d.hpp"
 #include <cstdio>
 #include <stdexcept>
 #include <string>
@@ -35,7 +36,7 @@ int main(int argc, char** args)
     vao->setElementBuffer(&ebo);
 
     vao->bind();
-    vao->getAttribute(0)->format(4, mogl::GLtype::_FLOAT, GL_FALSE, 0);
+    vao->attribute(0).format(4, mogl::GLtype::_FLOAT, GL_FALSE, 0);
 
     auto vertex_shader = gl.hAlloc<mogl::GLshader>(
       mogl::GLshaderType::_VERTEX,
@@ -44,11 +45,6 @@ int main(int argc, char** args)
 
         layout (location = 0) in vec3 vPos;
         layout (location = 1) in vec3 vColor;
-
-        out gl_PerVertex 
-        {
-          vec4 gl_Position;
-        };
         
         out vec3 fColor;
 
@@ -75,19 +71,26 @@ int main(int argc, char** args)
       )"
     );
 
-    auto program = gl.sAlloc<mogl::GLprogram>(vertex_shader, fragment_shader);
-    auto pipeline = gl.sAlloc<mogl::GLpipeline>();
+    auto program = gl.sAlloc<mogl::GLprogram>(GL_FALSE, *vertex_shader, *fragment_shader);
+    /*auto pipeline = gl.sAlloc<mogl::GLpipeline>();
 
     pipeline.attachProgram(program);
-    pipeline.use();
+    pipeline.use();*/
 
     auto& viewport = gl.getViewport();
     std::string viewportString = "Viewport = {" + std::to_string(viewport[0]) + ", " + std::to_string(viewport[1]) + ", " + std::to_string(viewport[2]) + ", " + std::to_string(viewport[3]) + "}\n";
     OutputDebugString(viewportString.c_str());
+
+    gl.setActiveBinary(program);
+    gl.drawArrays(*vao, mogl::GLdrawMode::_TRIANGLES, 0, 10);
+
+    auto tex = gl.sAlloc<mogl::GLtexture1d>(3, mogl::GLtextureFormat::_RGBA, 250);
+    std::string texInfo = "Texture = {" + std::to_string(tex.getID()) + ", " + std::to_string(tex.getDimensions().at(0)) + "}\n";
+    OutputDebugString(texInfo.c_str());
   }
   catch ( std::exception& e )
   {
-    OutputDebugString(e.what());
+    OutputDebugString(std::string(std::string(e.what()) + "\n").c_str());
   }
 
   return 0;

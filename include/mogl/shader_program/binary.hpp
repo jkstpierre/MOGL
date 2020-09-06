@@ -17,15 +17,8 @@ namespace mogl
  */
 class GLbinary
 {
+  friend class GLcontext; // Allow GLcontext to use a binary during draw calls
 public:
-  /**
-   * Uses this GLbinary for subsequent draw calls
-   *
-   * @author  jkstpierre
-   * @date  9/4/2020
-   */
-  virtual void use() const noexcept = 0;
-
   /**
    * Query if this GLbinary is active
    *
@@ -35,6 +28,15 @@ public:
    * @returns True if active, false if not.
    */
   bool isActive() const noexcept;
+
+protected:
+  /**
+   * Uses this GLbinary for subsequent draw calls
+   *
+   * @author  jkstpierre
+   * @date  9/4/2020
+   */
+  virtual void use() const noexcept = 0;
 
 protected:
   /**

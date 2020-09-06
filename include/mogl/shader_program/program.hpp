@@ -38,14 +38,6 @@ public:
 
 public:
   /**
-   * Uses this GLprogram for the next draw calls
-   *
-   * @author  jkstpierre
-   * @date  9/2/2020
-   */
-  void use() const noexcept override;
-
-  /**
    * Sets uniform boolean
    *
    * @author  jkstpierre
@@ -201,7 +193,7 @@ public:
    *
    * @returns A GLint.
    */
-  GLint attributeIndex(const std::string& name) const noexcept;
+  GLint getAttributeIndex(const std::string& name) const noexcept;
 
   /**
    * Uniform index
@@ -213,7 +205,7 @@ public:
    *
    * @returns A GLint.
    */
-  GLint uniformIndex(const std::string& name) const noexcept;
+  GLint getUniformIndex(const std::string& name) const noexcept;
 
   /**
    * Number of active attributes
@@ -223,7 +215,7 @@ public:
    *
    * @returns The total number of active attributes.
    */
-  GLint numberOfActiveAttributes() const noexcept;
+  GLint getActiveAttributeCount() const noexcept;
 
   /**
    * Number of active uniforms
@@ -233,7 +225,7 @@ public:
    *
    * @returns The total number of active uniforms.
    */
-  GLint numberOfActiveUniforms() const noexcept;
+  GLint getActiveUniformCount() const noexcept;
 
   /**
    * Gets shader components
@@ -245,14 +237,26 @@ public:
    */
   const std::unordered_set<GLshaderType>& getShaderComponents() const noexcept;
 
+  /**
+   * Is separable
+   *
+   * @author  jkstpierre
+   * @date  9/4/2020
+   *
+   * @returns A reference to a const GLboolean.
+   */
+  const GLboolean& isSeparable() const noexcept;
+
 private:
   /**
    * Creates an empty GLprogram
    *
    * @author  jkstpierre
    * @date  9/3/2020
+   *
+   * @param   separable The separable.
    */
-  GLprogram();
+  GLprogram(GLboolean separable);
 
   /**
    * Construct a new GLprogram object from a list of shaders
@@ -265,32 +269,9 @@ private:
    * @param   shaders   Variable arguments providing [in,out] The shaders.
    */
   template <class... sArgs>
-  GLprogram(const GLshader& shader_0, sArgs&&... shaders) : GLprogram(shaders...)
+  GLprogram(GLboolean separable, const GLshader& shader_0, sArgs&&... shaders) : GLprogram(separable, shaders...)
   {
     linkShader(shader_0);
-  }
-
-  /**
-   * Constructor
-   *
-   * @author  jkstpierre
-   * @date  9/3/2020
-   *
-   * @tparam  sArgs Type of the arguments.
-   * @param   pShader_0 The shader 0.
-   * @param   pShaders  Variable arguments providing [in,out] The shaders.
-   */
-  template <class... sArgs>
-  GLprogram(const std::unique_ptr<GLshader, GLshader::Deleter>& pShader_0, sArgs&&... pShaders) : GLprogram(pShaders...)
-  {
-    if ( pShader_0.get() )
-    {
-      linkShader(*pShader_0.get());
-    }
-    else
-    {
-      throw std::runtime_error("Cannot link null GLshader into GLprogram.");
-    }
   }
 
 private:
@@ -304,9 +285,20 @@ private:
    */
   void linkShader(const GLshader& shader);
 
+  /**
+   * Uses this GLprogram for the next draw calls
+   *
+   * @author  jkstpierre
+   * @date  9/2/2020
+   */
+  void use() const noexcept override;
+
 private:
   /** The set of shaders linked in this GLprogram */
   std::unordered_set<GLshaderType> mShaderComponents;
+
+  /** Track if the program object can be used in a GLpipeline */
+  GLboolean mSeparable;
 };
 }
 

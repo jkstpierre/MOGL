@@ -15,14 +15,14 @@ GLvertexArray::GLvertexArray()
   if ( mID )
   {
     // Initialize binding points
-    GLuint bindingPoints = numberOfBindingPoints();
+    GLuint bindingPoints = getBindingPointCount();
     for ( GLuint i = 0; i < bindingPoints; i++ )
     {
       mBindingPoints.emplace_back(new GLbindingPoint(mID, i), GLbindingPoint::Deleter());
     }
 
     // Initialize attributes
-    GLuint attributes = numberOfAttributes();
+    GLuint attributes = getAttributeCount();
     for ( GLuint i = 0; i < attributes; i++ )
     {
       mAttributes.emplace_back(new GLattribute(mID, i, *mBindingPoints.front()), GLattribute::Deleter());
@@ -55,27 +55,27 @@ void GLvertexArray::setElementBuffer(const GLbuffer<GLuint>* ebo) noexcept
   glVertexArrayElementBuffer(mID, ebo ? ebo->getID() : GL_NONE);
 }
 
-GLattribute* GLvertexArray::getAttribute(GLuint index)
+GLattribute& GLvertexArray::attribute(GLuint index)
 {
   if ( index >= mAttributes.size() )
   {
     throw std::runtime_error("Invalid attribute index.");
   }
 
-  return mAttributes.at(index).get();
+  return *mAttributes.at(index);
 }
 
-GLbindingPoint* GLvertexArray::getBindingPoint(GLuint index)
+GLbindingPoint& GLvertexArray::bindingPoint(GLuint index)
 {
   if ( index >= mBindingPoints.size() )
   {
     throw std::runtime_error("Invalid binding point index.");
   }
 
-  return mBindingPoints.at(index).get();
+  return *mBindingPoints.at(index);
 }
 
-GLuint GLvertexArray::numberOfAttributes() const noexcept
+GLuint GLvertexArray::getAttributeCount() const noexcept
 {
   static GLint attributes;
 
@@ -84,7 +84,7 @@ GLuint GLvertexArray::numberOfAttributes() const noexcept
   return static_cast<GLuint>(attributes);
 }
 
-GLuint GLvertexArray::numberOfBindingPoints() const noexcept
+GLuint GLvertexArray::getBindingPointCount() const noexcept
 {
   static GLint bindingPoints;
 

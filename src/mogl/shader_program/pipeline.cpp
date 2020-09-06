@@ -35,34 +35,29 @@ void GLpipeline::use() const noexcept
 
 void GLpipeline::attachProgram(const GLprogram& program)
 {
-  // Attach the program to the pipeline
-  glUseProgramStages(mID, GL_ALL_SHADER_BITS, program.getID());
-
-  // Validate the pipeline
-  glValidateProgramPipeline(mID);
-
-  // Check the status of the validation
-  static const GLuint ERROR_LOG_SIZE = 512U;
-  static GLchar errorLog[ERROR_LOG_SIZE];
-  static GLint success;
-  glGetProgramPipelineiv(mID, GL_VALIDATE_STATUS, &success);
-  if ( !success )
+  if ( program.isSeparable() )
   {
-    glGetProgramPipelineInfoLog(mID, ERROR_LOG_SIZE, nullptr, errorLog);
-    glDeleteProgramPipelines(1, &mID);
-    throw std::runtime_error("GLpipeline failed validation. OpenGL Error: " + std::string(errorLog));
-  }
-}
+    // Attach the program to the pipeline
+    glUseProgramStages(mID, GL_ALL_SHADER_BITS, program.getID());
 
-void GLpipeline::attachProgram(const std::unique_ptr<GLprogram, GLprogram::Deleter>& pProgram)
-{
-  if ( pProgram.get() )
-  {
-    attachProgram(*pProgram.get());
+    // Validate the pipeline
+    glValidateProgramPipeline(mID);
+
+    // Check the status of the validation
+    static const GLuint ERROR_LOG_SIZE = 512U;
+    static GLchar errorLog[ERROR_LOG_SIZE];
+    static GLint success;
+    glGetProgramPipelineiv(mID, GL_VALIDATE_STATUS, &success);
+    if ( !success )
+    {
+      glGetProgramPipelineInfoLog(mID, ERROR_LOG_SIZE, nullptr, errorLog);
+      glDeleteProgramPipelines(1, &mID);
+      throw std::runtime_error("GLpipeline failed validation. OpenGL Error: " + std::string(errorLog));
+    }
   }
   else
   {
-    throw std::runtime_error("GLpipeline cannot attach null program.");
+    throw std::runtime_error("GLpipeline cannot attach a GLprogram object that is not separable.");
   }
 }
 }

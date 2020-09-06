@@ -32,14 +32,6 @@ public:
   ~GLpipeline() noexcept;
 
   /**
-   * Use this pipeline object for rendering
-   *
-   * @author  jkstpierre
-   * @date  9/3/2020
-   */
-  void use() const noexcept override;
-
-  /**
    * Attach program
    *
    * @author  jkstpierre
@@ -49,16 +41,6 @@ public:
    */
   void attachProgram(const GLprogram& program);
 
-  /**
-   * Attach program
-   *
-   * @author  jkstpierre
-   * @date  9/4/2020
-   *
-   * @param   pProgram  The program.
-   */
-  void attachProgram(const std::unique_ptr<GLprogram, GLprogram::Deleter>& pProgram);
-
 private:
   /**
    * Default constructor
@@ -67,7 +49,16 @@ private:
    * @date  9/3/2020
    */
   GLpipeline();
-};
+
+private:
+  /**
+   * Use this pipeline object for rendering
+   *
+   * @author  jkstpierre
+   * @date  9/3/2020
+   */
+  void use() const noexcept override;
+}; 
 }
 
 #endif

@@ -107,6 +107,13 @@ GLcontext::GLcontext(GLubyte color, GLubyte depth, GLubyte stencil, GLubyte anti
   // Setup the initial viewport
   glGetIntegerv(GL_VIEWPORT, mViewport.data());
 
+  // Initialize the texture units
+  GLuint texUnits = getTextureUnitCount();
+  for ( GLuint texUnit = 0; texUnit < texUnits; texUnit++ )
+  {
+    mTextureUnits.push_back({ new GLtextureUnit(texUnit), GLtextureUnit::Deleter() });
+  }
+
   // Indicate successful context creation
   sActive = true;
 }
