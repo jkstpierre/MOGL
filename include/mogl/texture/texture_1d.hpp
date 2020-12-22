@@ -7,7 +7,7 @@
 #ifndef __MOGL_TEXTURE_GL_TEXTURE_1D_HPP__
 #define __MOGL_TEXTURE_GL_TEXTURE_1D_HPP__
 
-#include "mogl/texture/texture_1d_impl.hpp"
+#include "mogl/texture/base/texture_1d_impl.hpp"
 
 namespace mogl
 {

@@ -1,13 +1,13 @@
 /**
- * @file  texture/texture.hpp.
+ * @file  base/texture.hpp.
  *
  * Declares the texture class
  */
 
-#ifndef __MOGL_TEXTURE_GL_TEXTURE_HPP__
-#define __MOGL_TEXTURE_GL_TEXTURE_HPP__
+#ifndef __MOGL_TEXTURE_BASE_GL_TEXTURE_HPP__
+#define __MOGL_TEXTURE_BASE_GL_TEXTURE_HPP__
 
-#include "mogl/object.hpp"
+#include "mogl/base/object.hpp"
 #include "mogl/texture/texture_target.hpp"
 #include "mogl/texture/texture_format.hpp"
 #include <array>
@@ -78,6 +78,17 @@ public:
   const std::array<GLsizei, N>& getDimensions() const noexcept
   {
     return mcDimensions;
+  }
+
+  /**
+   * Generates the mipmaps for a texture
+   *
+   * @author  jkstpierre
+   * @date  9/6/2020
+   */
+  void generateMipmaps() noexcept
+  {
+    glGenerateTextureMipmap(mID);
   }
 
 protected:

@@ -30,13 +30,13 @@ int main(int argc, char** args)
     HWND window = CreateWindowA("STATIC", "Modern OpenGL Test", WS_POPUP | WS_DISABLED, 0, 0, 1, 1, NULL, NULL, GetModuleHandle(NULL), NULL);
     auto gl = mogl::GLcontext(32, 24, 8, 4, GetDC(window));
 
-    auto vao = gl.hAlloc<mogl::GLvertexArray>();
+    auto vao = gl.sAlloc<mogl::GLvertexArray>();
     auto ebo = gl.sAlloc<mogl::GLbuffer<GLuint>>();
 
-    vao->setElementBuffer(&ebo);
+    vao.setElementBuffer(&ebo);
 
-    vao->bind();
-    vao->attribute(0).format(4, mogl::GLtype::_FLOAT, GL_FALSE, 0);
+    vao.bind();
+    vao.attribute(0).format(4, mogl::GLtype::_FLOAT, GL_FALSE, 0);
 
     auto vertex_shader = gl.hAlloc<mogl::GLshader>(
       mogl::GLshaderType::_VERTEX,
@@ -82,10 +82,10 @@ int main(int argc, char** args)
     OutputDebugString(viewportString.c_str());
 
     gl.setActiveBinary(program);
-    gl.drawArrays(*vao, mogl::GLdrawMode::_TRIANGLES, 0, 10);
+    gl.drawArrays(vao, mogl::GLdrawMode::_TRIANGLES, 0, 10);
 
-    auto tex = gl.sAlloc<mogl::GLtexture1d>(3, mogl::GLtextureFormat::_RGBA, 250);
-    std::string texInfo = "Texture = {" + std::to_string(tex.getID()) + ", " + std::to_string(tex.getDimensions().at(0)) + "}\n";
+    auto tex = gl.hAlloc<mogl::GLtexture1d>(3, mogl::GLtextureFormat::_RGBA, 250);
+    std::string texInfo = "Texture = {" + std::to_string(tex->getFormat().asBase()) + ", " + std::to_string(tex->getDimensions().at(0)) + "}\n";
     OutputDebugString(texInfo.c_str());
   }
   catch ( std::exception& e )

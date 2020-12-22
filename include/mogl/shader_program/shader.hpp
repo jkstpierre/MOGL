@@ -7,7 +7,7 @@
 #ifndef __MOGL_SHADER_PROGRAM_GL_SHADER_HPP__
 #define __MOGL_SHADER_PROGRAM_GL_SHADER_HPP__
 
-#include "mogl/object.hpp"
+#include "mogl/base/object.hpp"
 #include "mogl/shader_program/shader_type.hpp"
 #include <string>
 

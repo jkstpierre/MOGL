@@ -10,7 +10,7 @@
 #include "mogl/platform.hpp"
 #include "mogl/draw_mode.hpp"
 #include "mogl/vertex_array/vertex_array.hpp"
-#include "mogl/shader_program/binary.hpp"
+#include "mogl/shader_program/base/binary.hpp"
 #include "mogl/texture/texture_unit.hpp"
 #include <memory>
 #include <array>
@@ -157,6 +157,14 @@ public:
   GLtextureUnit& textureUnit(GLuint index);
 
   /**
+   * Detaches all samplers and textures from the texture units
+   *
+   * @author  jkstpierre
+   * @date  9/6/2020
+   */
+  void clearTextureUnits() noexcept;
+
+  /**
    * Gets texture unit count
    *
    * @author  jkstpierre
@@ -166,7 +174,18 @@ public:
    */
   GLuint getTextureUnitCount() const noexcept;
 
-  // DRAW COMMANDS 
+  /**
+   * DRAW COMMANDS
+   *
+   * @author  jkstpierre
+   * @date  9/7/2020
+   *
+   * @param   r A GLfloat to process.
+   * @param   g A GLfloat to process.
+   * @param   b A GLfloat to process.
+   * @param   a A GLfloat to process.
+   */
+  void clear(GLfloat r, GLfloat g, GLfloat b, GLfloat a) const noexcept;
 
   /**
    * Draw arrays

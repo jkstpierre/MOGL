@@ -7,7 +7,7 @@
 #ifndef __MOGL_SHADER_PROGRAM_GL_PIPELINE_HPP__
 #define __MOGL_SHADER_PROGRAM_GL_PIPELINE_HPP__
 
-#include "mogl/object.hpp"
+#include "mogl/base/object.hpp"
 #include "mogl/shader_program/program.hpp"
 
 namespace mogl

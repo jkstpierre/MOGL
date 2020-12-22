@@ -37,11 +37,26 @@ GLtextureUnit& GLcontext::textureUnit(GLuint index)
   return *mTextureUnits.at(index);
 }
 
+void GLcontext::clearTextureUnits() noexcept
+{
+  for ( auto&& texUnit : mTextureUnits )
+  {
+    texUnit->bindSampler(nullptr);
+    texUnit->bindTexture(nullptr);
+  }
+}
+
 GLuint GLcontext::getTextureUnitCount() const noexcept
 {
   static GLint textureUnits;
   glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &textureUnits);
   return static_cast<GLuint>(textureUnits);
+}
+
+void GLcontext::clear(GLfloat r, GLfloat g, GLfloat b, GLfloat a) const noexcept
+{
+  glClearColor(r, g, b, a);
+  glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void GLcontext::drawArrays(const GLvertexArray& vao, GLdrawMode mode, GLint first, GLsizei count) const noexcept

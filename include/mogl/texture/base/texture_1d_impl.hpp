@@ -1,13 +1,13 @@
 /**
- * @file  texture/texture_1d_impl.hpp.
+ * @file  base/texture_1d_impl.hpp.
  *
  * Declares the texture 1d implementation class
  */
 
-#ifndef __MOGL_TEXTURE_GL_TEXTURE_1D_IMPL_HPP__
-#define __MOGL_TEXTURE_GL_TEXTURE_1D_IMPL_HPP__
+#ifndef __MOGL_TEXTURE_BASE_GL_TEXTURE_1D_IMPL_HPP__
+#define __MOGL_TEXTURE_BASE_GL_TEXTURE_1D_IMPL_HPP__
 
-#include "mogl/texture/texture.hpp"
+#include "mogl/texture/base/texture.hpp"
 #include "mogl/texture/texture_format.hpp"
 
 namespace mogl
@@ -35,19 +35,9 @@ public:
    * @param   width   The width.
    * @param   pData   The data.
    */
-  void setSubImage(GLint level, GLint xoffset, GLsizei width, const void* pData)
+  void fillData(GLint level, GLint xoffset, GLsizei width, const void* pData)
   {
-    if ( xoffset + width > this->mDimensions[0] )
-    {
-      throw std::runtime_error("Cannot set image array indices outside the bounds of the allocated storage.");
-    }
-
-    if ( level >= this->mcLevels )
-    {
-      throw std::runtime_error("Cannot set level outside the bounds of the allocated storage.");
-    }
-
-    // TODO: Do more error checking? Apparently with each subsequent mipmap level, the dimensions should diminish by powers of 2 according to the OpenGL 4.6 spec
+    // TODO: Do error checking?
 
     glTextureSubImage1D(mID, level, xoffset, width, this->mcFormat.asBase(), GL_UNSIGNED_BYTE, pData);
   }
@@ -64,7 +54,8 @@ protected:
    * @param   format  The internal format.
    * @param   width   The width.
    */
-  GLtexture1dImpl(GLtextureTarget target, GLsizei levels, GLtextureFormat format, GLsizei width) : GLtexture<T, 1>(target, levels, format, { width })
+  GLtexture1dImpl(GLtextureTarget target, GLsizei levels, GLtextureFormat format, GLsizei width) 
+    : GLtexture<T, 1>(target, levels, format, { width })
   {
     glTextureStorage1D(mID, levels, format.asInternal(), width);
   }

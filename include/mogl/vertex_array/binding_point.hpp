@@ -7,7 +7,7 @@
 #ifndef __MOGL_VERTEX_ARRAY_GL_BINDING_POINT_HPP__
 #define __MOGL_VERTEX_ARRAY_GL_BINDING_POINT_HPP__
 
-#include "mogl/heap_protected.hpp"
+#include "mogl/base/heap_protected.hpp"
 #include "mogl/buffer/buffer.hpp"
 
 namespace mogl

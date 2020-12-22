@@ -7,7 +7,7 @@
 #ifndef __MOGL_BUFFER_GL_BUFFER_HPP__
 #define __MOGL_BUFFER_GL_BUFFER_HPP__
 
-#include "mogl/object.hpp"
+#include "mogl/base/object.hpp"
 #include "mogl/buffer/buffer_access.hpp"
 #include "mogl/buffer/buffer_usage.hpp"
 #include <stdexcept>

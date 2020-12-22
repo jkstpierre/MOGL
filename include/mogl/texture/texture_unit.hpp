@@ -7,10 +7,10 @@
 #ifndef __MOGL_TEXTURE_GL_TEXTURE_UNIT_HPP__
 #define __MOGL_TEXTURE_GL_TEXTURE_UNIT_HPP__
 
-#include "mogl/heap_protected.hpp"
+#include "mogl/base/heap_protected.hpp"
 #include "mogl/platform.hpp"
 #include "mogl/texture/sampler.hpp"
-#include "mogl/texture/texture.hpp"
+#include "mogl/texture/base/texture.hpp"
 
 namespace mogl
 {
@@ -58,6 +58,16 @@ public:
     mTextureID = pTexture ? pTexture->getID() : GL_NONE;
     glBindTextureUnit(mcIndex, mTextureID);
   }
+
+  /**
+   * Bind null texture
+   *
+   * @author  jkstpierre
+   * @date  9/6/2020
+   *
+   * @param   parameter1  The first parameter.
+   */
+  void bindTexture(nullptr_t) noexcept;
 
   /**
    * Gets the index

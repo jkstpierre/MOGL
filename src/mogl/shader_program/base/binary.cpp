@@ -4,7 +4,7 @@
  * Implements the binary class
  */
 
-#include "mogl/shader_program/binary.hpp"
+#include "mogl/shader_program/base/binary.hpp"
 
 namespace mogl
 {

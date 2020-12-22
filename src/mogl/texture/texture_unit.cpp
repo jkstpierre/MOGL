@@ -20,6 +20,11 @@ void GLtextureUnit::bindSampler(const GLsampler* pSampler) noexcept
   glBindSampler(mcIndex, mSamplerID);
 }
 
+void GLtextureUnit::bindTexture(nullptr_t) noexcept
+{
+  bindTexture<nullptr_t, 0>(nullptr);
+}
+
 const GLuint& GLtextureUnit::getIndex() const noexcept
 {
   return mcIndex;

@@ -7,7 +7,7 @@
 #ifndef __MOGL_VERTEX_ARRAY_GL_VERTEX_ARRAY_HPP__
 #define __MOGL_VERTEX_ARRAY_GL_VERTEX_ARRAY_HPP__
 
-#include "mogl//object.hpp"
+#include "mogl/base/object.hpp"
 #include "mogl/buffer/buffer.hpp"
 #include "mogl/vertex_array/attribute.hpp"
 #include "mogl/vertex_array/binding_point.hpp"

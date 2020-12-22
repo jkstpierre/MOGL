@@ -4,11 +4,11 @@
  * Declares the object class
  */
 
-#ifndef __MOGL_GL_OBJECT_HPP__
-#define __MOGL_GL_OBJECT_HPP__
+#ifndef __MOGL_BASE_GL_OBJECT_HPP__
+#define __MOGL_BASE_GL_OBJECT_HPP__
 
 #include "mogl/platform.hpp"
-#include "mogl/heap_protected.hpp"
+#include "mogl/base/heap_protected.hpp"
 
 namespace mogl
 {

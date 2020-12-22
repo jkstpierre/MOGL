@@ -1,11 +1,11 @@
 /**
- * @file  mogl/heap_protected.hpp.
+ * @file  base/heap_protected.hpp.
  *
  * Declares the heap protected class
  */
 
-#ifndef __MOGL_HEAP_PROTECTED_HPP__
-#define __MOGL_HEAP_PROTECTED_HPP__
+#ifndef __MOGL_BASE_HEAP_PROTECTED_HPP__
+#define __MOGL_BASE_HEAP_PROTECTED_HPP__
 
 namespace mogl
 {

@@ -8,6 +8,7 @@
 
 namespace mogl
 {
-GLtexture1d::GLtexture1d(GLsizei levels, GLtextureFormat format, GLsizei width) : GLtexture1dImpl(GLtextureTarget::_TEXTURE_1D, levels, format, width)
+GLtexture1d::GLtexture1d(GLsizei levels, GLtextureFormat format, GLsizei width) 
+  : GLtexture1dImpl(GLtextureTarget::_TEXTURE_1D, levels, format, width)
 {}
 }

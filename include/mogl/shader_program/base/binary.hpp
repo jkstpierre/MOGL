@@ -1,11 +1,11 @@
 /**
- * @file  shader_program/binary.hpp.
+ * @file  base/binary.hpp.
  *
  * Declares the binary class
  */
 
-#ifndef __MOGL_SHADER_PROGRAM_GL_BINARY_HPP__
-#define __MOGL_SHADER_PROGRAM_GL_BINARY_HPP__
+#ifndef __MOGL_SHADER_PROGRAM_BASE_GL_BINARY_HPP__
+#define __MOGL_SHADER_PROGRAM_BASE_GL_BINARY_HPP__
 
 namespace mogl
 {

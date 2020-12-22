@@ -7,7 +7,7 @@
 #ifndef __MOGL_TEXTURE_GL_SAMPLER_HPP__
 #define __MOGL_TEXTURE_GL_SAMPLER_HPP__
 
-#include "mogl/object.hpp"
+#include "mogl/base/object.hpp"
 
 namespace mogl
 {
@@ -20,7 +20,10 @@ namespace mogl
  */
 class GLsampler final : public GLobject<GLsampler>
 {
+  friend class GLcontext; // 
+private:
 
+public:
 };
 }
 

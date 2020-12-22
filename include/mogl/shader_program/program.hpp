@@ -7,9 +7,9 @@
 #ifndef __MOGL_SHADER_PROGRAM_GL_PROGRAM_HPP__
 #define __MOGL_SHADER_PROGRAM_GL_PROGRAM_HPP__
 
-#include "mogl/object.hpp"
+#include "mogl/base/object.hpp"
 #include "mogl/shader_program/shader.hpp"
-#include "mogl/shader_program/binary.hpp"
+#include "mogl/shader_program/base/binary.hpp"
 #include <vector>
 #include <memory>
 #include <unordered_set>
